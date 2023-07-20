@@ -5,6 +5,7 @@
         <script src='scripts/mustache.js' type="text/javascript"></script>
         <script src='scripts/easeljs-0.7.0.min.js' type="text/javascript"></script>
         <script src='scripts/dygraphs.1.1.1.min.js' type="text/javascript"></script>
+        <script src='scripts/regression.min.js' type="text/javascript"></script>
         <script src='scripts/gammaSpectrum.js' type="text/javascript"></script>
         <script src='scripts/fitit.js' type="text/javascript"></script>
         <script src="scripts/jquery1-11-3.min.js"></script>
@@ -32,28 +33,88 @@
 
         <!--helpful hints-->
         <div class='col-md-6'>
-            <div id='waitMessage' class="alert alert-warning" role="alert">
+            <div id='decisionMessage' class="alert alert-warning" role="alert">
+                <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+                Select if you want to manually select peaks or try the auto-peak finder.
+            </div>
+
+            <div id='waitMessage' class="alert alert-warning hidden" role="alert">
                 <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                 Spectra downloading, please wait...
             </div>
 
             <div id='regionMessage' class="alert alert-warning hidden" role="alert">
                 <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
-                Shift-click either end of a single line crossing both peaks you'd like to calibrate on.<br>
+                Shift-click the centres of 4 peaks you'd like to calibrate with. The peak of interest should be the tallest within the search area defined.
+
+	      <br>The click also sets the position on the y axis so aim for the full height of the peak.
+            </div>
+	    <!-- Original text for this shiftclick message
+            <div id='regionMessage' class="alert alert-warning hidden" role="alert">
+                <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+                Shift-click each end of a single line crossing both peaks you'd like to calibrate with.
+	      <br>The first click also sets the position on the y axis.<br>
                 Tip: aim low and wide! 
             </div>
-
+            -->
             <div id='pickerMessage' class="alert alert-warning hidden" role="alert">
                 <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
-                Enter the each peak's position along the line counting from the left, and its energy.
+                Enter each peak's position along the line counting from the left, and its energy.
             </div>
 
             <div id='reviewMessage' class="alert alert-warning hidden" role="alert">
                 <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
-                Review the results in the table below, and refit any pathological peaks one at a time.
+                Review the results in the table below, and refit any troublesome peaks one at a time.
             </div>
         </div>
 
+	<div id='decisionBar' class='col-md-12'>
+		        <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Co-60' engaged='0'>
+                            <span id='autoCalibBadge-Co-60' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate 60Co</span>
+                        </button>
+		        <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Ar-34' engaged='0'>
+                            <span id='autoCalibBadge-Ar-34' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate 34Ar</span>
+                        </button>
+		        <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Ar-41' engaged='0'>
+                            <span id='autoCalibBadge-Ar-41' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate 41Ar</span>
+                        </button>
+		        <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Co-56' engaged='0'>
+                            <span id='autoCalibBadge-Co-56' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate 56Co</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Ba-133' engaged='0'>
+                            <span id='autoCalibBadge-Ba-133' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate 133Ba</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Cs-137' engaged='0'>
+                            <span id='autoCalibBadge-Cs-137' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate 137Cs</span>
+                        </button>
+<br>
+	                <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Eu-152' engaged='0'>
+                            <span id='autoCalibBadge-Eu-152' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate 152Eu</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Bi-207' engaged='0'>
+                            <span id='autoCalibBadge-Bi-207' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate 207Bi</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-lg" id='automaticCalibration-Background' engaged='0'>
+                            <span id='autoCalibBadge-Background' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='autoText'>Auto-Calibrate Background</span>
+                        </button>
+<br>
+                    <div class='col-md-12'>
+                        <button type="button" class="btn btn-default btn-lg" id='manualCalibration' engaged='0'>
+                            <span id='manCalibBadge' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='manualText'>Manual Calibration</span>
+                        </button>
+                    </div>
+	</div>
+	
         <!--peak definition-->
         <div id='setupBar' class='col-md-12'></div>
 
@@ -66,17 +127,25 @@
                     <div class='col-md-12'>
                         <button type="button" class="btn btn-default btn-lg" id='fitLow' engaged='0'>
                             <span id='refitLoBadge' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
-                            <span id='loText'>Refit Low Energy Peak</span>
+                            <span id='loText'>Refit Peak 1</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-lg" id='fitMid' engaged='0'>
+                            <span id='refitMidBadge' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='hiText'>Refit Peak 2</span>
                         </button>
                         <button type="button" class="btn btn-default btn-lg" id='fitHigh' engaged='0'>
                             <span id='refitHiBadge' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
-                            <span id='hiText'>Refit High Energy Peak</span>
+                            <span id='hiText'>Refit Peak 3</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-lg" id='fitvHi' engaged='0'>
+                            <span id='refitvHiBadge' class="glyphicon glyphicon-equalizer" aria-hidden="true"></span> 
+                            <span id='hiText'>Refit Peak 4</span>
                         </button>
                     </div>
                 </div>
             </div>
             <div class='col-md-2 item'>
-                <div id='plotList'></div>
+                <div id='plotList' style='overflow-y:scroll; height:400px;'></div>
             </div>
         </div>
 
@@ -85,6 +154,10 @@
         <!--Resolution-->
         <div id='resolutionSection' class='sectionWrapper'>
             <div id='resolutionWrap' class='col-md-6 item'>
+                <div id='Peak1centroids'></div>
+                <div id='Peak2centroids'></div>
+                <div id='Peak3centroids'></div>
+                <div id='Peak4centroids'></div>
                 <div id='resolution'></div>
             </div>
         </div>
@@ -97,8 +170,12 @@
                 dataStore._plotGrid = new plotGrid('plottingGrid');
                 dataStore._plotControl = new plotControl('plotCtrl', 'horizontal');
                 dataStore._plotListLite = new plotListLite('plotList');
-                dataStore._gainMatchReport = new gainMatchReport('gainMatcher', 'setupBar');
-                dataStore._striptool = new striptool('resolution');
+                dataStore._gainMatchReport = new gainMatchReport('gainMatcher', 'setupBar'); 
+                dataStore._striptool = new striptool('resolution'); 
+                dataStore._striptoolP1 = new striptool('Peak1'); 
+                dataStore._striptoolP2 = new striptool('Peak2'); 
+                dataStore._striptoolP3 = new striptool('Peak3'); 
+                dataStore._striptoolP4 = new striptool('Peak4');
 
                 dataStore.templates = prepareTemplates(['header', 'gainMatchReport', 'matchReportTable', 'gainMatchSetupBar', 'plotGrid', 'plotControl', 'plotListLite', 'striptool', 'footer']);
 
@@ -108,22 +185,28 @@
                 //set up spectrum cell
                 dataStore._plotGrid.manageCellCreation(null, dataStore.plots[0]);
                 dataStore._plotListLite.setup();
-                dataStore._gainMatchReport.setup();
-                dataStore._striptool.setup();
+                dataStore._gainMatchReport.setup(); 
+                dataStore._striptool.setup(); 
+                dataStore._striptoolP1.setup(); 
+                dataStore._striptoolP2.setup(); 
+                dataStore._striptoolP3.setup(); 
+                dataStore._striptoolP4.setup(); 
                 setupFooter('foot');
-
-                // set up shift-click behavior:
-                dataStore.viewers[dataStore.plots[0]].shiftclickCallback = shiftclick;
 
                 //don't want additional plots in this app
                 deleteNode('plottingGridnewPlotButton');
 
-                //plug in special fit controls
-                document.getElementById('fitLow').onclick = dataStore._gainMatchReport.toggleFitMode;
-                document.getElementById('fitHigh').onclick = dataStore._gainMatchReport.toggleFitMode;
-
-                //identify, register & fetch all spectra
-                promiseScript(dataStore.DAQquery)
+                //plug in mode decision controls
+                document.getElementById('manualCalibration').onclick = setupManualCalibration; 
+                document.getElementById('automaticCalibration-Co-60').onclick = function() { setupAutomaticCalibration('Co-60'); }; 
+                document.getElementById('automaticCalibration-Ar-34').onclick = function() { setupAutomaticCalibration('Ar-34'); }; 
+                document.getElementById('automaticCalibration-Ar-41').onclick = function() { setupAutomaticCalibration('Ar-41'); }; 
+                document.getElementById('automaticCalibration-Co-56').onclick = function() { setupAutomaticCalibration('Co-56'); }; 
+                document.getElementById('automaticCalibration-Ba-133').onclick = function() { setupAutomaticCalibration('Ba-133'); }; 
+                document.getElementById('automaticCalibration-Cs-137').onclick = function() { setupAutomaticCalibration('Cs-137'); }; 
+                document.getElementById('automaticCalibration-Eu-152').onclick = function() { setupAutomaticCalibration('Eu-152'); }; 
+                document.getElementById('automaticCalibration-Bi-207').onclick = function() { setupAutomaticCalibration('Bi-207'); };
+                document.getElementById('automaticCalibration-Background').onclick = function() { setupAutomaticCalibration('Background'); };
 
                 $(function () {
                     $('[data-toggle="tooltip"]').tooltip()

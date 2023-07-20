@@ -35,7 +35,7 @@ function releaser(operation, terminate, num) {
 function getSelected(id){
     //return the current value selected by the select element with id.
     //thx http://stackoverflow.com/questions/1085801/get-selected-value-in-dropdown-list-using-javascript
-
+    
     var e = document.getElementById(id);
     return e.options[e.selectedIndex].value;
 }
@@ -461,4 +461,86 @@ function pokeURL(url){
     req.open('GET', url);
     // Make the request
     req.send();
+}
+
+function inverseMatrix(_A) {
+    // Credit to https://gist.github.com/husa/5652439
+    var temp,
+    N = _A.length,
+    E = [];
+   
+    for (var i = 0; i < N; i++)
+      E[i] = [];
+   
+    for (i = 0; i < N; i++)
+      for (var j = 0; j < N; j++) {
+        E[i][j] = 0;
+        if (i == j)
+          E[i][j] = 1;
+      }
+   
+    for (var k = 0; k < N; k++) {
+      temp = _A[k][k];
+   
+      for (var j = 0; j < N; j++)
+      {
+        _A[k][j] /= temp;
+        E[k][j] /= temp;
+      }
+   
+      for (var i = k + 1; i < N; i++)
+      {
+        temp = _A[i][k];
+   
+        for (var j = 0; j < N; j++)
+        {
+          _A[i][j] -= _A[k][j] * temp;
+          E[i][j] -= E[k][j] * temp;
+        }
+      }
+    }
+   
+    for (var k = N - 1; k > 0; k--)
+    {
+      for (var i = k - 1; i >= 0; i--)
+      {
+        temp = _A[i][k];
+   
+        for (var j = 0; j < N; j++)
+        {
+          _A[i][j] -= _A[k][j] * temp;
+          E[i][j] -= E[k][j] * temp;
+        }
+      }
+    }
+   
+    for (var i = 0; i < N; i++)
+      for (var j = 0; j < N; j++)
+        _A[i][j] = E[i][j];
+    return _A;
+}
+
+function transposeMatrix(matrix) {
+    console.log('helpers,transposeMatrix(matrix):'+matrix);
+    const rows = matrix.length, cols = matrix[0].length;
+  const grid = [];
+  for (let j = 0; j < cols; j++) {
+    grid[j] = Array(rows);
+  }
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      grid[j][i] = matrix[i][j];
+    }
+  }
+  return grid;
+}
+
+function dotProductMatrix(a,b){
+  let result = 0;
+  for (let i = 0; i < 3; i++) {
+    result += a[i] * b[i];
+    console.log('result'+i+'='+result);
+  }
+    console.log('dotProductMatrix a,b,result'+a+' - '+b+' - '+result);
+    return result;
 }
