@@ -154,10 +154,6 @@
         <!--Resolution-->
         <div id='resolutionSection' class='sectionWrapper'>
             <div id='resolutionWrap' class='col-md-6 item'>
-                <div id='Peak1centroids'></div>
-                <div id='Peak2centroids'></div>
-                <div id='Peak3centroids'></div>
-                <div id='Peak4centroids'></div>
                 <div id='resolution'></div>
             </div>
         </div>
@@ -171,11 +167,7 @@
                 dataStore._plotControl = new plotControl('plotCtrl', 'horizontal');
                 dataStore._plotListLite = new plotListLite('plotList');
                 dataStore._gainMatchReport = new gainMatchReport('gainMatcher', 'setupBar'); 
-                dataStore._striptool = new striptool('resolution'); 
-                dataStore._striptoolP1 = new striptool('Peak1'); 
-                dataStore._striptoolP2 = new striptool('Peak2'); 
-                dataStore._striptoolP3 = new striptool('Peak3'); 
-                dataStore._striptoolP4 = new striptool('Peak4');
+                dataStore._striptool = new striptool('resolution');
 
                 dataStore.templates = prepareTemplates(['header', 'gainMatchReport', 'matchReportTable', 'gainMatchSetupBar', 'plotGrid', 'plotControl', 'plotListLite', 'striptool', 'footer']);
 
@@ -187,10 +179,6 @@
                 dataStore._plotListLite.setup();
                 dataStore._gainMatchReport.setup(); 
                 dataStore._striptool.setup(); 
-                dataStore._striptoolP1.setup(); 
-                dataStore._striptoolP2.setup(); 
-                dataStore._striptoolP3.setup(); 
-                dataStore._striptoolP4.setup(); 
                 setupFooter('foot');
 
                 //don't want additional plots in this app
